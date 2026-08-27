@@ -11,7 +11,7 @@
 | **Public GitHub Repository** | ✅ | [Stellar-OrangeBelt-Challenge](https://github.com/hrshjswniii/Stellar-OrangeBelt-Challenge) |
 | **README & Complete Documentation** | ✅ | Architectural specs, setup guide, inter-contract diagrams |
 | **Minimum 10+ Meaningful Commits** | ✅ | Granular feature, test, CI/CD, and docs commits |
-| **Live Demo Link** | 🔗 | [Vercel Deployment Link](https://stellar-orangebelt-challenge.vercel.app) |
+| **Live Demo Link** | 🔗 | https://stellar-escrow-marketplace.vercel.app?_vercel_share=srk2X7AOoC1X9s91aSGy3TaAeibTqAq6 |
 | **Contract Deployment Address (Marketplace)** | 📜 | [`CC34J56AEX7L7P483XKJ74N3LKJ5AKNU5D5FF6E2XMWN5QMTEBSEQU`](https://stellar.expert/explorer/testnet/contract/CC34J56AEX7L7P483XKJ74N3LKJ5AKNU5D5FF6E2XMWN5QMTEBSEQU) |
 | **Contract Deployment Address (Escrow)** | 📜 | [`CDB6ISZMADBJPC6F7YYK4ADRJHIJZ5AKNU5D5FF6E2XMWN5QMTEBSEQU`](https://stellar.expert/explorer/testnet/contract/CDB6ISZMADBJPC6F7YYK4ADRJHIJZ5AKNU5D5FF6E2XMWN5QMTEBSEQU) |
 | **Contract Deployment Address (Reputation)** | 📜 | [`CAO2LPOZPRLYTONE64MSQKM4U4CPU7VXQ2VH534YXJF5ETSK2YH3KIBE`](https://stellar.expert/explorer/testnet/contract/CAO2LPOZPRLYTONE64MSQKM4U4CPU7VXQ2VH534YXJF5ETSK2YH3KIBE) |
@@ -22,13 +22,25 @@
 ## 📸 Screenshots & Verification Artifacts
 
 ### 1. Mobile Responsive UI
-![Mobile Responsive UI Placeholder]([SCREENSHOT_MOBILE_UI_PLACEHOLDER])
+
+
+<img width="922" height="698" alt="Screenshot 2026-08-27 191538" src="https://github.com/user-attachments/assets/c81b364c-36d9-491d-96e0-143f45ba75d0" />
+
 
 ### 2. GitHub Actions CI/CD Pipeline Running
-![CI/CD Pipeline Running Placeholder]([SCREENSHOT_CICD_PIPELINE_PLACEHOLDER])
+
+
+<img width="1917" height="915" alt="Screenshot 2026-08-27 191703" src="https://github.com/user-attachments/assets/a8bb7723-0f55-45a5-b1db-359266686e10" />
+
 
 ### 3. Smart Contract & Frontend Test Output (Passing Tests)
-![Test Output Placeholder]([SCREENSHOT_TEST_RESULTS_PLACEHOLDER])
+
+
+<img width="1356" height="840" alt="Screenshot 2026-08-27 222201" src="https://github.com/user-attachments/assets/5e6076ca-3e98-43cb-bcde-c695f79f5c73" />
+
+
+<img width="1256" height="305" alt="Screenshot 2026-08-27 222406" src="https://github.com/user-attachments/assets/ba7c253e-47c8-4329-b725-7179e366bff9" />
+
 
 ---
 
