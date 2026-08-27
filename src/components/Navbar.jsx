@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Wallet, PlusCircle, FileCode, Award, Layers } from 'lucide-react';
+import { ShieldCheck, Wallet, PlusCircle, FileCode } from 'lucide-react';
 import { formatAmount } from '../services/sorobanClient';
 
 export default function Navbar({
@@ -7,7 +7,6 @@ export default function Navbar({
   onSwitchRole,
   onOpenCreateListing,
   onOpenContractInfo,
-  userReputation,
 }) {
   return (
     <header className="navbar">
@@ -23,7 +22,6 @@ export default function Navbar({
           className="btn btn-secondary"
           onClick={onOpenContractInfo}
           title="View Soroban Contract Addresses & Verification"
-          style={{ fontSize: '0.85rem' }}
         >
           <FileCode size={16} className="text-muted" />
           <span>Contract Specs</span>
@@ -35,16 +33,7 @@ export default function Navbar({
         </button>
 
         {/* Role Selector Pill */}
-        <div
-          style={{
-            display: 'flex',
-            align: 'center',
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '3px',
-            borderRadius: '12px',
-            border: '1px solid var(--border-color)',
-          }}
-        >
+        <div className="role-selector-pill">
           {['buyer', 'seller', 'arbitrator'].map((role) => (
             <button
               key={role}
@@ -70,17 +59,7 @@ export default function Navbar({
         </div>
 
         {/* Wallet Status Badge */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            background: 'rgba(22, 31, 53, 0.9)',
-            border: '1px solid var(--border-color)',
-            padding: '0.4rem 0.8rem',
-            borderRadius: '12px',
-          }}
-        >
+        <div className="wallet-status-badge">
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{wallet?.shortAddress}</span>
             <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
@@ -98,6 +77,7 @@ export default function Navbar({
               borderRadius: '8px',
               background: 'rgba(139, 92, 246, 0.2)',
               color: '#c084fc',
+              flexShrink: 0,
             }}
           >
             <Wallet size={18} />
