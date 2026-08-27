@@ -1,0 +1,21 @@
+{
+  "network": "testnet",
+  "primaryTxHash": "36353e7d451403c75becfda39b9f63e0944e5604514412ea8dda3deb748cad29",
+  "contracts": {
+    "marketplace_contract": {
+      "address": "CC34J56AEX7L7P483XKJ74N3LKJ5AKNU5D5FF6E2XMWN5QMTEBSEQU",
+      "uploadTxHash": "637dd7dea73fdb5fa154dd4694be950167e9060721ab92bb6ab7abf4f7d0ad1c"
+    },
+    "escrow_contract": {
+      "address": "CDB6ISZMADBJPC6F7YYK4ADRJHIJZ5AKNU5D5FF6E2XMWN5QMTEBSEQU",
+      "uploadTxHash": "084ea1729a47d3258569298eab72c5164595dee2616ac648aae9cf9ceb00aa32",
+      "createTxHash": "bc430c24490afd57de976df1425dae6b3dcd452b60e2224e0837312d928f1cc3"
+    },
+    "reputation_contract": {
+      "address": "CAO2LPOZPRLYTONE64MSQKM4U4CPU7VXQ2VH534YXJF5ETSK2YH3KIBE",
+      "uploadTxHash": "36353e7d451403c75becfda39b9f63e0944e5604514412ea8dda3deb748cad29",
+      "createTxHash": "e4dad05c6f01b56f5e936aa3701a5590c7016f022b3899cfe445d5d0497e765d"
+    }
+  },
+  "stellarExpertExplorer": "https://stellar.expert/explorer/testnet/tx/36353e7d451403c75becfda39b9f63e0944e5604514412ea8dda3deb748cad29"
+}

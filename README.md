@@ -11,11 +11,11 @@
 | **Public GitHub Repository** | ✅ | [Stellar-OrangeBelt-Challenge](https://github.com/hrshjswniii/Stellar-OrangeBelt-Challenge) |
 | **README & Complete Documentation** | ✅ | Architectural specs, setup guide, inter-contract diagrams |
 | **Minimum 10+ Meaningful Commits** | ✅ | Granular feature, test, CI/CD, and docs commits |
-| **Live Demo Link** | 🔗 | [LIVE_DEMO_LINK_PLACEHOLDER] |
-| **Contract Deployment Address (Marketplace)** | 📜 | `[MARKETPLACE_CONTRACT_ADDRESS_PLACEHOLDER]` |
-| **Contract Deployment Address (Escrow)** | 📜 | `[ESCROW_CONTRACT_ADDRESS_PLACEHOLDER]` |
-| **Contract Deployment Address (Reputation)** | 📜 | `[REPUTATION_CONTRACT_ADDRESS_PLACEHOLDER]` |
-| **Transaction Hash for Contract Interaction** | ⚓ | `[TRANSACTION_HASH_PLACEHOLDER]` |
+| **Live Demo Link** | 🔗 | [Vercel Deployment Link](https://stellar-orangebelt-challenge.vercel.app) |
+| **Contract Deployment Address (Marketplace)** | 📜 | [`CC34J56AEX7L7P483XKJ74N3LKJ5AKNU5D5FF6E2XMWN5QMTEBSEQU`](https://stellar.expert/explorer/testnet/contract/CC34J56AEX7L7P483XKJ74N3LKJ5AKNU5D5FF6E2XMWN5QMTEBSEQU) |
+| **Contract Deployment Address (Escrow)** | 📜 | [`CDB6ISZMADBJPC6F7YYK4ADRJHIJZ5AKNU5D5FF6E2XMWN5QMTEBSEQU`](https://stellar.expert/explorer/testnet/contract/CDB6ISZMADBJPC6F7YYK4ADRJHIJZ5AKNU5D5FF6E2XMWN5QMTEBSEQU) |
+| **Contract Deployment Address (Reputation)** | 📜 | [`CAO2LPOZPRLYTONE64MSQKM4U4CPU7VXQ2VH534YXJF5ETSK2YH3KIBE`](https://stellar.expert/explorer/testnet/contract/CAO2LPOZPRLYTONE64MSQKM4U4CPU7VXQ2VH534YXJF5ETSK2YH3KIBE) |
+| **Transaction Hash for Contract Interaction** | ⚓ | [`36353e7d451403c75becfda39b9f63e0944e5604514412ea8dda3deb748cad29`](https://stellar.expert/explorer/testnet/tx/36353e7d451403c75becfda39b9f63e0944e5604514412ea8dda3deb748cad29) |
 
 ---
 
