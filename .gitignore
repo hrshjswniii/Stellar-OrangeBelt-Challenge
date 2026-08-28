@@ -16,3 +16,5 @@ target/
 Thumbs.db
 .vscode/
 .idea/
+
+.vercel
