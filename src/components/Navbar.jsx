@@ -4,12 +4,15 @@ import { formatAmount } from '../services/sorobanClient';
 
 export default function Navbar({
   wallet,
+  activeRole,
   onConnectFreighter,
   onDisconnectWallet,
   onSwitchRole,
   onOpenCreateListing,
   onOpenContractInfo,
 }) {
+  const isFreighterConnected = wallet && wallet.connected && !wallet.isMock;
+
   return (
     <header className="navbar">
       <div className="brand-logo">
@@ -35,7 +38,7 @@ export default function Navbar({
         </button>
 
         {/* Connect / Disconnect Wallet Button */}
-        {!wallet?.isMock ? (
+        {isFreighterConnected ? (
           <button
             className="btn btn-secondary"
             onClick={onDisconnectWallet}
@@ -67,10 +70,10 @@ export default function Navbar({
               key={role}
               onClick={() => onSwitchRole(role)}
               style={{
-                background: wallet?.role?.toLowerCase().includes(role)
+                background: activeRole === role
                   ? 'linear-gradient(135deg, var(--accent-purple), var(--accent-indigo))'
                   : 'transparent',
-                color: wallet?.role?.toLowerCase().includes(role) ? '#fff' : 'var(--text-muted)',
+                color: activeRole === role ? '#fff' : 'var(--text-muted)',
                 border: 'none',
                 padding: '4px 10px',
                 borderRadius: '8px',
@@ -89,9 +92,11 @@ export default function Navbar({
         {/* Wallet Status Badge */}
         <div className="wallet-status-badge">
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{wallet?.shortAddress}</span>
-            <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
-              {formatAmount(wallet?.balance || 0)} XLM
+            <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
+              {isFreighterConnected ? wallet.shortAddress : 'Not Connected'}
+            </span>
+            <span style={{ fontSize: '0.7rem', color: isFreighterConnected ? '#38bdf8' : 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+              {isFreighterConnected ? `${formatAmount(wallet?.balance || 10000)} XLM` : '-- XLM'}
             </span>
           </div>
 
@@ -103,8 +108,8 @@ export default function Navbar({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: !wallet?.isMock ? 'rgba(16, 185, 129, 0.2)' : 'rgba(139, 92, 246, 0.2)',
-              color: !wallet?.isMock ? '#34d399' : '#c084fc',
+              background: isFreighterConnected ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: isFreighterConnected ? '#34d399' : 'var(--text-dim)',
               flexShrink: 0,
             }}
           >

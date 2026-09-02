@@ -14,7 +14,6 @@ import {
   CONTRACT_ADDRESSES,
 } from './services/mockData';
 import {
-  connectWallet,
   connectFreighterWallet,
   invokeSorobanContract,
   fetchSorobanEvents,
@@ -23,6 +22,7 @@ import { Sparkles, Search } from 'lucide-react';
 
 export default function App() {
   const [wallet, setWallet] = useState(null);
+  const [activeRole, setActiveRole] = useState('buyer'); // buyer | seller | arbitrator
   const [services, setServices] = useState(INITIAL_SERVICES);
   const [escrows, setEscrows] = useState(INITIAL_ESCROWS);
   const [leaderboard] = useState(INITIAL_LEADERBOARD);
@@ -48,13 +48,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('MARKETPLACE');
   const [txLoading, setTxLoading] = useState(false);
 
-  // Initialize wallet on load
-  useEffect(() => {
-    connectWallet('buyer', false)
-      .then(setWallet)
-      .catch(() => connectWallet('buyer', true).then(setWallet));
-  }, []);
-
   // Poll Soroban RPC events periodically
   useEffect(() => {
     const timer = setInterval(async () => {
@@ -78,16 +71,14 @@ export default function App() {
     }
   };
 
-  const handleDisconnectWallet = async () => {
-    const fallbackWallet = await connectWallet('buyer', true);
-    setWallet(fallbackWallet);
-    pushEvent('WALLET_DISCONNECTED', 'Freighter Wallet disconnected. Switched back to interactive mode.', '#fb7185');
+  const handleDisconnectWallet = () => {
+    setWallet(null);
+    pushEvent('WALLET_DISCONNECTED', 'Freighter Wallet disconnected.', '#fb7185');
   };
 
-  const handleSwitchRole = async (role) => {
-    const w = await connectWallet(role, true);
-    setWallet(w);
-    pushEvent('ROLE_SWITCH', `Active wallet role switched to ${role.toUpperCase()} (${w.shortAddress})`, '#c084fc');
+  const handleSwitchRole = (role) => {
+    setActiveRole(role);
+    pushEvent('ROLE_SWITCH', `Active UI role switched to ${role.toUpperCase()}`, '#c084fc');
   };
 
   const pushEvent = (type, message, color = '#38bdf8') => {
@@ -116,7 +107,7 @@ export default function App() {
 
     let txHash = null;
     try {
-      if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.marketplace,
           method: 'buy_service',
@@ -175,7 +166,7 @@ export default function App() {
     const sellerAddress = wallet?.address || 'GBX42A7M5KQR9W2X8L3N4P1Q6V0Y7Z9K21';
 
     try {
-      if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.marketplace,
           method: 'create_listing',
@@ -216,7 +207,7 @@ export default function App() {
     const sellerAddress = wallet?.address || 'GBX42A7M5KQR9W2X8L3N4P1Q6V0Y7Z9K21';
 
     try {
-      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'submit_work',
@@ -248,7 +239,7 @@ export default function App() {
     const buyerAddress = wallet?.address || 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
 
     try {
-      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'approve_and_release',
@@ -278,7 +269,7 @@ export default function App() {
     const callerAddress = wallet?.address || 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
 
     try {
-      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'raise_dispute',
@@ -308,7 +299,7 @@ export default function App() {
     const arbitratorAddress = wallet?.address || 'GARB993M5P7R9V1W3X5Y7Z9A2B4C6D88DAO';
 
     try {
-      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && !wallet?.isMock) {
+      if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'resolve_dispute',
@@ -355,6 +346,7 @@ export default function App() {
     <div>
       <Navbar
         wallet={wallet}
+        activeRole={activeRole}
         onConnectFreighter={handleConnectFreighter}
         onDisconnectWallet={handleDisconnectWallet}
         onSwitchRole={handleSwitchRole}
@@ -480,7 +472,7 @@ export default function App() {
             ) : (
               <EscrowDashboard
                 escrows={escrows}
-                currentRole={wallet?.role || 'buyer'}
+                currentRole={activeRole}
                 onSubmitWork={handleSubmitWork}
                 onApprovePayment={handleApprovePayment}
                 onRaiseDispute={handleRaiseDispute}
