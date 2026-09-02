@@ -20,7 +20,12 @@ import {
 } from './services/sorobanClient';
 import { Sparkles, Search } from 'lucide-react';
 
+const DEFAULT_BUYER_ADDRESS = 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
+const DEFAULT_SELLER_ADDRESS = 'GBX42A7M5KQR9W2X8L3N4P1Q6V0Y7Z9K21';
+const DEFAULT_ARBITRATOR_ADDRESS = 'GARB993M5P7R9V1W3X5Y7Z9A2B4C6D88DAO';
+
 export default function App() {
+  // Disconnected by default on page load / refresh
   const [wallet, setWallet] = useState(null);
   const [activeRole, setActiveRole] = useState('buyer'); // buyer | seller | arbitrator
   const [services, setServices] = useState(INITIAL_SERVICES);
@@ -61,13 +66,35 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  // Compute distinct addresses based on activeRole & connected wallet
+  const getRoleAddresses = () => {
+    let buyer = DEFAULT_BUYER_ADDRESS;
+    let seller = DEFAULT_SELLER_ADDRESS;
+    let arbitrator = DEFAULT_ARBITRATOR_ADDRESS;
+
+    if (wallet?.address) {
+      if (activeRole === 'buyer') buyer = wallet.address;
+      else if (activeRole === 'seller') seller = wallet.address;
+      else if (activeRole === 'arbitrator') arbitrator = wallet.address;
+    }
+
+    return {
+      buyerFull: buyer,
+      buyerShort: `${buyer.slice(0, 6)}...${buyer.slice(-4)}`,
+      sellerFull: seller,
+      sellerShort: `${seller.slice(0, 6)}...${seller.slice(-4)}`,
+      arbitratorFull: arbitrator,
+      arbitratorShort: `${arbitrator.slice(0, 6)}...${arbitrator.slice(-4)}`,
+    };
+  };
+
   const handleConnectFreighter = async () => {
     try {
       const freighterWallet = await connectFreighterWallet();
       setWallet(freighterWallet);
       pushEvent('WALLET_CONNECTED', `Freighter Wallet connected: ${freighterWallet.shortAddress}`, '#34d399');
     } catch (err) {
-      alert(`Freighter Connection Error: ${err.message}`);
+      alert(`Freighter Connection Notice: ${err.message}`);
     }
   };
 
@@ -97,7 +124,7 @@ export default function App() {
   const handleBuyService = async (service) => {
     setTxLoading(true);
     const newEscrowId = escrows.length + 101;
-    const buyerAddress = wallet?.address || 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
+    const roleAddrs = getRoleAddresses();
 
     pushEvent(
       'SOROBAN_TX_BUILDING',
@@ -112,13 +139,13 @@ export default function App() {
           contractId: CONTRACT_ADDRESSES.marketplace,
           method: 'buy_service',
           args: [
-            { type: 'Address', value: buyerAddress },
+            { type: 'Address', value: roleAddrs.buyerFull },
             BigInt(service.id),
             { type: 'Address', value: CONTRACT_ADDRESSES.escrow },
-            { type: 'Address', value: 'GARB993M5P7R9V1W3X5Y7Z9A2B4C6D88DAO' },
+            { type: 'Address', value: roleAddrs.arbitratorFull },
             { type: 'Address', value: CONTRACT_ADDRESSES.reputation },
           ],
-          signerAddress: buyerAddress,
+          signerAddress: roleAddrs.buyerFull,
         });
         txHash = result.hash;
         pushEvent('SOROBAN_TX_SUCCESS', `Soroban buy_service confirmed on Testnet! Tx Hash: ${txHash.slice(0, 10)}...`, '#34d399');
@@ -140,12 +167,12 @@ export default function App() {
       id: newEscrowId,
       serviceId: service.id,
       serviceTitle: service.title,
-      buyer: wallet?.shortAddress || 'GCP77B...11AA',
-      buyerFull: buyerAddress,
-      seller: service.seller,
-      sellerFull: service.sellerFull,
-      arbitrator: 'GARB99...88DAO',
-      arbitratorFull: 'GARB993M5P7R9V1W3X5Y7Z9A2B4C6D88DAO',
+      buyer: roleAddrs.buyerShort,
+      buyerFull: roleAddrs.buyerFull,
+      seller: roleAddrs.sellerShort,
+      sellerFull: roleAddrs.sellerFull,
+      arbitrator: roleAddrs.arbitratorShort,
+      arbitratorFull: roleAddrs.arbitratorFull,
       amount: service.price,
       status: 'Funded',
       statusCode: 0,
@@ -163,7 +190,7 @@ export default function App() {
   // Create Listing -> Invokes Marketplace contract `create_listing` via Soroban SDK
   const handleCreateListing = async (newServiceData) => {
     setTxLoading(true);
-    const sellerAddress = wallet?.address || 'GBX42A7M5KQR9W2X8L3N4P1Q6V0Y7Z9K21';
+    const roleAddrs = getRoleAddresses();
 
     try {
       if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && wallet?.connected) {
@@ -171,13 +198,13 @@ export default function App() {
           contractId: CONTRACT_ADDRESSES.marketplace,
           method: 'create_listing',
           args: [
-            { type: 'Address', value: sellerAddress },
+            { type: 'Address', value: roleAddrs.sellerFull },
             newServiceData.title,
             newServiceData.description,
             BigInt(newServiceData.price),
             0,
           ],
-          signerAddress: sellerAddress,
+          signerAddress: roleAddrs.sellerFull,
         });
         pushEvent('SOROBAN_TX_SUCCESS', `Listing created on Soroban Testnet! Tx: ${result.hash.slice(0, 10)}...`, '#34d399');
       } else {
@@ -192,8 +219,8 @@ export default function App() {
     const newService = {
       id: services.length + 1,
       ...newServiceData,
-      seller: wallet?.shortAddress || 'GBX42A...9K21',
-      sellerFull: sellerAddress,
+      seller: roleAddrs.sellerShort,
+      sellerFull: roleAddrs.sellerFull,
       rating: 100,
       totalSales: 0,
       active: true,
@@ -204,15 +231,15 @@ export default function App() {
   // Submit Work -> Invokes Escrow contract `submit_work`
   const handleSubmitWork = async (escrowId) => {
     setTxLoading(true);
-    const sellerAddress = wallet?.address || 'GBX42A7M5KQR9W2X8L3N4P1Q6V0Y7Z9K21';
+    const roleAddrs = getRoleAddresses();
 
     try {
       if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'submit_work',
-          args: [BigInt(escrowId), { type: 'Address', value: sellerAddress }],
-          signerAddress: sellerAddress,
+          args: [BigInt(escrowId), { type: 'Address', value: roleAddrs.sellerFull }],
+          signerAddress: roleAddrs.sellerFull,
         });
         pushEvent('WORK_SUBMITTED_TX', `Soroban submit_work confirmed! Tx: ${result.hash.slice(0, 10)}...`, '#34d399');
       } else {
@@ -236,15 +263,15 @@ export default function App() {
   // Approve Payment -> Invokes Escrow contract `approve_and_release`
   const handleApprovePayment = async (escrowId) => {
     setTxLoading(true);
-    const buyerAddress = wallet?.address || 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
+    const roleAddrs = getRoleAddresses();
 
     try {
       if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'approve_and_release',
-          args: [BigInt(escrowId), { type: 'Address', value: buyerAddress }],
-          signerAddress: buyerAddress,
+          args: [BigInt(escrowId), { type: 'Address', value: roleAddrs.buyerFull }],
+          signerAddress: roleAddrs.buyerFull,
         });
         pushEvent('ESCROW_APPROVED_TX', `Soroban approve_and_release confirmed! Funds released. Tx: ${result.hash.slice(0, 10)}...`, '#34d399');
       } else {
@@ -266,15 +293,15 @@ export default function App() {
   // Raise Dispute -> Invokes Escrow contract `raise_dispute`
   const handleRaiseDispute = async (escrowId) => {
     setTxLoading(true);
-    const callerAddress = wallet?.address || 'GCP77B3M5P7R9V1W3X5Y7Z9A2B4C6D11AA';
+    const roleAddrs = getRoleAddresses();
 
     try {
       if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'raise_dispute',
-          args: [BigInt(escrowId), { type: 'Address', value: callerAddress }],
-          signerAddress: callerAddress,
+          args: [BigInt(escrowId), { type: 'Address', value: roleAddrs.buyerFull }],
+          signerAddress: roleAddrs.buyerFull,
         });
         pushEvent('DISPUTE_RAISED_TX', `Soroban raise_dispute confirmed! Tx: ${result.hash.slice(0, 10)}...`, '#fb7185');
       } else {
@@ -296,15 +323,15 @@ export default function App() {
   // Resolve Dispute -> Invokes Escrow contract `resolve_dispute`
   const handleResolveDispute = async (escrowId, releaseToSeller) => {
     setTxLoading(true);
-    const arbitratorAddress = wallet?.address || 'GARB993M5P7R9V1W3X5Y7Z9A2B4C6D88DAO';
+    const roleAddrs = getRoleAddresses();
 
     try {
       if (CONTRACT_ADDRESSES.escrow && !CONTRACT_ADDRESSES.escrow.includes('PLACEHOLDER') && wallet?.connected) {
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.escrow,
           method: 'resolve_dispute',
-          args: [BigInt(escrowId), { type: 'Address', value: arbitratorAddress }, releaseToSeller],
-          signerAddress: arbitratorAddress,
+          args: [BigInt(escrowId), { type: 'Address', value: roleAddrs.arbitratorFull }, releaseToSeller],
+          signerAddress: roleAddrs.arbitratorFull,
         });
         pushEvent('DISPUTE_RESOLVED_TX', `Soroban resolve_dispute confirmed! Tx: ${result.hash.slice(0, 10)}...`, '#c084fc');
       } else {

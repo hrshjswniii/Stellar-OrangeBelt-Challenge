@@ -13,6 +13,7 @@ import {
   isConnected as isFreighterConnected,
   isAllowed as isFreighterAllowed,
   setAllowed as setFreighterAllowed,
+  requestAccess as requestFreighterAccess,
   getUserInfo as getFreighterUserInfo,
   signTransaction as signFreighterTransaction,
 } from '@stellar/freighter-api';
@@ -51,78 +52,55 @@ export const MOCK_WALLETS = {
 export const checkFreighterInstalled = async () => {
   try {
     const connected = await isFreighterConnected();
-    return connected;
+    if (connected) return true;
   } catch (e) {
-    return typeof window !== 'undefined' && Boolean(window.freighter);
+    // fallback
   }
+  return typeof window !== 'undefined' && Boolean(window.freighter);
 };
 
 /**
- * Connects to a real Freighter wallet, requesting permissions if needed
+ * Connects to real Freighter wallet, ALWAYS requesting/triggering extension authorization popup
  */
 export const connectFreighterWallet = async () => {
+  const installed = await checkFreighterInstalled();
+  if (!installed) {
+    throw new Error('Freighter extension is not detected in your browser. Please install Freighter from https://www.freighter.app/');
+  }
+
+  let publicKey = null;
   try {
-    const installed = await checkFreighterInstalled();
-    if (!installed) {
-      throw new Error('Freighter wallet extension is not detected in your browser.');
-    }
+    // Call requestFreighterAccess to open Freighter extension authorization prompt
+    publicKey = await requestFreighterAccess();
+  } catch (e) {
+    console.warn('requestAccess prompt warning:', e);
+  }
 
-    const allowed = await isFreighterAllowed();
-    if (!allowed) {
-      await setFreighterAllowed();
-    }
-
-    let publicKey = null;
+  if (!publicKey) {
     try {
+      await setFreighterAllowed();
       const userInfo = await getFreighterUserInfo();
       publicKey = userInfo?.publicKey;
     } catch (e) {
       // Fallback
     }
-
-    if (!publicKey && typeof window !== 'undefined' && window.freighter) {
-      publicKey = await window.freighter.getPublicKey();
-    }
-
-    if (!publicKey) {
-      throw new Error('Could not retrieve public key from Freighter.');
-    }
-
-    return {
-      connected: true,
-      address: publicKey,
-      shortAddress: `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}`,
-      balance: 10000,
-      isMock: false,
-      role: 'Freighter Wallet User',
-    };
-  } catch (err) {
-    console.warn('Freighter wallet connection failed:', err.message);
-    throw err;
-  }
-};
-
-/**
- * Connects wallet - tries real Freighter wallet first, or falls back to interactive role mock
- */
-export const connectWallet = async (preferredRole = 'buyer', forceMock = false) => {
-  if (!forceMock) {
-    try {
-      const wallet = await connectFreighterWallet();
-      if (wallet) return wallet;
-    } catch (e) {
-      console.log('Falling back to interactive mock wallet mode for review.');
-    }
   }
 
-  const mock = MOCK_WALLETS[preferredRole] || MOCK_WALLETS.buyer;
+  if (!publicKey && typeof window !== 'undefined' && window.freighter) {
+    publicKey = await window.freighter.getPublicKey();
+  }
+
+  if (!publicKey) {
+    throw new Error('User cancelled or denied Freighter connection request.');
+  }
+
   return {
     connected: true,
-    address: mock.address,
-    shortAddress: mock.short,
-    balance: mock.balance,
-    isMock: true,
-    role: mock.role,
+    address: publicKey,
+    shortAddress: `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}`,
+    balance: 10000,
+    isMock: false,
+    role: 'Freighter User',
   };
 };
 
