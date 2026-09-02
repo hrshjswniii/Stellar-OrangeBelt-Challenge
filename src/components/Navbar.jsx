@@ -1,9 +1,10 @@
 import React from 'react';
-import { ShieldCheck, Wallet, PlusCircle, FileCode } from 'lucide-react';
+import { ShieldCheck, Wallet, PlusCircle, FileCode, CheckCircle2, Zap } from 'lucide-react';
 import { formatAmount } from '../services/sorobanClient';
 
 export default function Navbar({
   wallet,
+  onConnectFreighter,
   onSwitchRole,
   onOpenCreateListing,
   onOpenContractInfo,
@@ -30,6 +31,25 @@ export default function Navbar({
         <button className="btn btn-primary" onClick={onOpenCreateListing}>
           <PlusCircle size={16} />
           <span>List Service</span>
+        </button>
+
+        {/* Freighter Connect Button */}
+        <button
+          className="btn btn-secondary"
+          onClick={onConnectFreighter}
+          style={{
+            background: !wallet?.isMock
+              ? 'rgba(16, 185, 129, 0.15)'
+              : 'rgba(139, 92, 246, 0.15)',
+            borderColor: !wallet?.isMock
+              ? 'rgba(16, 185, 129, 0.4)'
+              : 'rgba(139, 92, 246, 0.4)',
+            color: !wallet?.isMock ? '#34d399' : '#c084fc',
+          }}
+          title="Connect browser Freighter wallet for real Soroban transaction signing"
+        >
+          {!wallet?.isMock ? <CheckCircle2 size={16} /> : <Zap size={16} />}
+          <span>{!wallet?.isMock ? 'Freighter Connected' : 'Connect Freighter'}</span>
         </button>
 
         {/* Role Selector Pill */}
@@ -75,8 +95,8 @@ export default function Navbar({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'rgba(139, 92, 246, 0.2)',
-              color: '#c084fc',
+              background: !wallet?.isMock ? 'rgba(16, 185, 129, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+              color: !wallet?.isMock ? '#34d399' : '#c084fc',
               flexShrink: 0,
             }}
           >
