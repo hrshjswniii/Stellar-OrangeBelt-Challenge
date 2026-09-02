@@ -1,10 +1,11 @@
 import React from 'react';
-import { ShieldCheck, Wallet, PlusCircle, FileCode, CheckCircle2, Zap } from 'lucide-react';
+import { ShieldCheck, Wallet, PlusCircle, FileCode, Zap, LogOut } from 'lucide-react';
 import { formatAmount } from '../services/sorobanClient';
 
 export default function Navbar({
   wallet,
   onConnectFreighter,
+  onDisconnectWallet,
   onSwitchRole,
   onOpenCreateListing,
   onOpenContractInfo,
@@ -33,24 +34,31 @@ export default function Navbar({
           <span>List Service</span>
         </button>
 
-        {/* Freighter Connect Button */}
-        <button
-          className="btn btn-secondary"
-          onClick={onConnectFreighter}
-          style={{
-            background: !wallet?.isMock
-              ? 'rgba(16, 185, 129, 0.15)'
-              : 'rgba(139, 92, 246, 0.15)',
-            borderColor: !wallet?.isMock
-              ? 'rgba(16, 185, 129, 0.4)'
-              : 'rgba(139, 92, 246, 0.4)',
-            color: !wallet?.isMock ? '#34d399' : '#c084fc',
-          }}
-          title="Connect browser Freighter wallet for real Soroban transaction signing"
-        >
-          {!wallet?.isMock ? <CheckCircle2 size={16} /> : <Zap size={16} />}
-          <span>{!wallet?.isMock ? 'Freighter Connected' : 'Connect Freighter'}</span>
-        </button>
+        {/* Connect / Disconnect Wallet Button */}
+        {!wallet?.isMock ? (
+          <button
+            className="btn btn-secondary"
+            onClick={onDisconnectWallet}
+            style={{
+              background: 'rgba(244, 63, 94, 0.15)',
+              borderColor: 'rgba(244, 63, 94, 0.4)',
+              color: '#fb7185',
+            }}
+            title="Disconnect active Freighter wallet"
+          >
+            <LogOut size={16} />
+            <span>Disconnect</span>
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary"
+            onClick={onConnectFreighter}
+            title="Connect browser Freighter wallet for real Soroban transaction signing"
+          >
+            <Zap size={16} />
+            <span>Connect Freighter</span>
+          </button>
+        )}
 
         {/* Role Selector Pill */}
         <div className="role-selector-pill">

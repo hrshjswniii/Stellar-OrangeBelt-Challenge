@@ -78,6 +78,12 @@ export default function App() {
     }
   };
 
+  const handleDisconnectWallet = async () => {
+    const fallbackWallet = await connectWallet('buyer', true);
+    setWallet(fallbackWallet);
+    pushEvent('WALLET_DISCONNECTED', 'Freighter Wallet disconnected. Switched back to interactive mode.', '#fb7185');
+  };
+
   const handleSwitchRole = async (role) => {
     const w = await connectWallet(role, true);
     setWallet(w);
@@ -111,7 +117,6 @@ export default function App() {
     let txHash = null;
     try {
       if (CONTRACT_ADDRESSES.marketplace && !CONTRACT_ADDRESSES.marketplace.includes('PLACEHOLDER') && !wallet?.isMock) {
-        // Real Soroban Contract Invocation via @stellar/stellar-sdk & @stellar/freighter-api
         const result = await invokeSorobanContract({
           contractId: CONTRACT_ADDRESSES.marketplace,
           method: 'buy_service',
@@ -351,6 +356,7 @@ export default function App() {
       <Navbar
         wallet={wallet}
         onConnectFreighter={handleConnectFreighter}
+        onDisconnectWallet={handleDisconnectWallet}
         onSwitchRole={handleSwitchRole}
         onOpenCreateListing={() => setIsCreateListingOpen(true)}
         onOpenContractInfo={() => setIsContractInfoOpen(true)}
